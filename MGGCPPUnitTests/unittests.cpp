@@ -13,7 +13,7 @@ namespace MGGCPPUnitTests
 		TEST_METHOD(TestMethod1)
 		{
 			Graph g;
-			g.t = 3;
+			g.t = 4;
 			Assert::IsTrue(true);
 		}
 
