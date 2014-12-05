@@ -16,9 +16,14 @@ namespace MGGCPPUnitTests
 	TEST_CLASS(UnitTest1)
 	{
 		Graph<Place, Edge> _graph;
-		DepthFirstVisit<Place, Edge> dfs;
 		
 	public:
+
+		TEST_METHOD(DepthFirstVisit)
+		{
+			//DepthFirstVisit<Place, Edge> dfs;
+			Assert::IsTrue(true);
+		}
 
 		TEST_METHOD(Edge_ConstructorAndGetters)
 		{
@@ -46,13 +51,6 @@ namespace MGGCPPUnitTests
 			Assert::IsTrue(!_graph.Contains(t));
 			Assert::IsTrue(!_graph.Remove(t));
 		}
-
-		TEST_METHOD(stack) {
-			//_graph.CheckAccess(2);
-
-			Assert::IsTrue(true);
-		}
-
 
 		TEST_METHOD(AddGetRemoveEdges)
 		{
@@ -158,7 +156,7 @@ namespace MGGCPPUnitTests
 			Assert::IsTrue(graphEdgesFromCtoA.size()==0);
 		}
 
-
+		/* NON-ITERATOR WORKING CODE
 		TEST_METHOD(DepthFirstVisit)
 		{
 			City a("a");
@@ -178,27 +176,6 @@ namespace MGGCPPUnitTests
 			vector<Place> dfv = _graph.DepthFirstVisit(a);
 			Assert::IsTrue(true);
 		}
-
-
-		TEST_METHOD(Pippo)
-		{
-			Edge<std::string> e("ciao", "pollo", 5);
-			map< int, vector<string> > m;
-			m[0].push_back("ciao");
-			m[0].push_back("salut");
-			m[1].push_back("ciao1");
-			m[1].push_back("salut1");
-
-			for (auto iter = m.cbegin(); iter != m.cend(); ++iter) {
-				vector<string> tmp = iter->second;
-				for (unsigned int i = 0; i<tmp.size(); ++i) {
-					cout << tmp[i] << endl;
-				}
-			}
-			
-			Assert::IsTrue(true);
-		}
-
-
+		*/
 	};
 }

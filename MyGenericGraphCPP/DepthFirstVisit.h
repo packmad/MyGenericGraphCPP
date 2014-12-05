@@ -5,23 +5,24 @@
 #include "Common.h"
 using namespace std;
 
-template <typename V, template<typename> class E>
-class DepthFirstVisit : public std::iterator<input_iterator_tag, V>
+template <typename V, template<typename V> class E>
+class DepthFirstVisit : public iterator<input_iterator_tag, V>
 {
 private:
-	Graph<V, E<V>> _graph;
+	Graph<V, E> _graph;
 public:
-	DepthFirstVisit() {}
-	DepthFirstVisit(const Graph<V, E> graph) {
+	DepthFirstVisit() : iterator() {}
+	
+	DepthFirstVisit(const Graph<V, E> graph) : iterator() {
 		_graph = graph;
 	};
-	/*
-	DepthFirstVisit(const DepthFirstVisit<V, E<V>>& dfs)  {};
-	bool operator!=(const DepthFirstVisit<V, E<V>>& rhs) { return true; }
-	bool operator==(const DepthFirstVisit<V, E<V>>& rhs) { return true; }
-	DepthFirstVisit<V, E<V>>& operator++() { return *this; }
-	DepthFirstVisit<V, E<V>>& operator*() { return *this; }
-	*/
+	
+	DepthFirstVisit(const DepthFirstVisit<V, E>& dfs)  {};
+	bool operator!=(const DepthFirstVisit<V, E>& rhs) { return true; }
+	bool operator==(const DepthFirstVisit<V, E>& rhs) { return true; }
+	DepthFirstVisit<V, E>& operator++() { return *this; }
+	DepthFirstVisit<V, E>& operator*() { return *this; }
+	
 };
 
 #endif

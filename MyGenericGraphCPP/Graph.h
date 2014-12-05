@@ -5,7 +5,7 @@
 #include "Common.h"
 using namespace std;
 
-template <typename V, template<typename> class E>
+template <typename V, template<typename V> class E>
 class Graph {
 	map< V, vector<E<V>> > _vertexToNeighbors;
 	unsigned long int _footprint;
