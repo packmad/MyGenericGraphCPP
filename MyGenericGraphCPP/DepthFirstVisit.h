@@ -13,16 +13,16 @@ private:
 public:
 	DepthFirstVisit() : iterator() {}
 	
-	DepthFirstVisit(const Graph<V, E> graph) : iterator() {
+	DepthFirstVisit(const Graph<V, E<V>> graph) : iterator() {
 		_graph = graph;
 	};
-	
+	/*
 	DepthFirstVisit(const DepthFirstVisit<V, E>& dfs)  {};
 	bool operator!=(const DepthFirstVisit<V, E>& rhs) { return true; }
 	bool operator==(const DepthFirstVisit<V, E>& rhs) { return true; }
 	DepthFirstVisit<V, E>& operator++() { return *this; }
 	DepthFirstVisit<V, E>& operator*() { return *this; }
-	
+	*/
 };
 
 #endif
