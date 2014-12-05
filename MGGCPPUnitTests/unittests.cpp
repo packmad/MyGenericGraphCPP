@@ -16,6 +16,7 @@ namespace MGGCPPUnitTests
 	TEST_CLASS(UnitTest1)
 	{
 		Graph<Place, Edge> _graph;
+		DepthFirstVisit<Place, Edge> dfs;
 		
 	public:
 
