@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Color.h" />
-    <ClInclude Include="Common.h" />
     <ClInclude Include="DepthFirstVisit.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Graph.h" />

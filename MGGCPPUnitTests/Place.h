@@ -1,7 +1,8 @@
 #pragma once
 #ifndef PLACE_H
 #define PLACE_H
-#include "Common.h"
+
+#include <string>
 
 using namespace std;
 

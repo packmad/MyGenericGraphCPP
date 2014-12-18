@@ -3,7 +3,7 @@
 #include "Graph.h"
 #include "Edge.h"
 #include "Place.h"
-#include "DepthFirstVisit.h"
+//#include "DepthFirstVisit.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -19,11 +19,35 @@ namespace MGGCPPUnitTests
 		
 	public:
 
-		TEST_METHOD(DepthFirstVisit)
+		TEST_METHOD(DFSvisit)
 		{
-			//DepthFirstVisit<Place, Edge> dfs;
-			Assert::IsTrue(true);
+			City a("a");
+			Town b("b");
+			City c("c");
+			Town d("d");
+			Town e("e");
+			vector<Place> testVertexes = { a, d, c, e, b};
+			vector<Edge<Place>> testEdges = {
+				Edge<Place>(a, b, 1),
+				Edge<Place>(c, e, 2),
+				Edge<Place>(a, d, 3),
+				Edge<Place>(d, c, 4),
+				Edge<Place>(b, c, 5),
+			};
+			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
+				_graph.Add(*it);
+			}
+
+			vector<Place> visitedVertexes;
+			for (auto it = _graph.beginDFS(a); it != _graph.endDFS(); ++(*it)) {
+				Place* t = (*it).visited;
+				visitedVertexes.push_back(*t);
+			}
+			
+			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
+			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
 		}
+		
 
 		TEST_METHOD(Edge_ConstructorAndGetters)
 		{
@@ -59,6 +83,8 @@ namespace MGGCPPUnitTests
 			City c("c");
 			Town d("d");
 			vector<Edge<Place>> testEdges = { Edge<Place>(a, b, 1), Edge<Place>(b, c, 2), Edge<Place> (c, d, 3)};
+			auto boh = testEdges.end(); //TODO remove
+			auto npt = nullptr;
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
@@ -156,16 +182,18 @@ namespace MGGCPPUnitTests
 			Assert::IsTrue(graphEdgesFromCtoA.size()==0);
 		}
 
-		/* NON-ITERATOR WORKING CODE
-		TEST_METHOD(DepthFirstVisit)
+		/* NON-ITERATOR WORKING CODE */
+		TEST_METHOD(DFSnonIter)
 		{
 			City a("a");
 			Town b("b");
 			City c("c");
 			Town d("d");
+			Town e("e");
+			vector<Place> testVertexes = { a, b, c, d, e };
 			vector<Edge<Place>> testEdges = {
 				Edge<Place>(a, b, 1),
-				Edge<Place>(a, c, 2),
+				Edge<Place>(c, e, 2),
 				Edge<Place>(a, d, 3),
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
@@ -173,9 +201,12 @@ namespace MGGCPPUnitTests
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
-			vector<Place> dfv = _graph.DepthFirstVisit(a);
+			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
+				_graph.Add(*it);
+			}
+			vector<Place> dfv = _graph.DFSNonIter(a);
 			Assert::IsTrue(true);
 		}
-		*/
+		
 	};
 }

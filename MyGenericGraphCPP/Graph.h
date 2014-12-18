@@ -2,13 +2,29 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include "Common.h"
+#include <algorithm>
+#include <functional>
+#include <deque>
+#include <iostream>
+#include <iterator>
+#include <stack>
+#include <stdexcept>
+#include <unordered_set>
+#include <vector>
+#include <map>
+#include "Color.h"
+#include "DepthFirstVisit.h"
+
 using namespace std;
+
+template <typename V, template<typename V> class E>
+class DepthFirstVisit;
 
 template <typename V, template<typename V> class E>
 class Graph {
 	map< V, vector<E<V>> > _vertexToNeighbors;
 	unsigned long int _footprint;
+	
 
 	void AddSrcDst(E<V>& edge)
 	{
@@ -20,7 +36,9 @@ class Graph {
 
 public:
 	Graph() {}
-	Graph(const int x) {}
+	Graph(const int x) {
+
+	}
 
 	void CheckAccess(int localFootprint) {
 		if (_footprint != localFootprint)
@@ -131,7 +149,7 @@ public:
 
 	vector<E<V>> GetEdges(V vertex)
 	{
-		return _vertexToNeighbors[vertex]; //TODO new?
+		return _vertexToNeighbors[vertex];
 	}
 
 	vector<E<V>> GetEdges(V src, V dst)
@@ -148,10 +166,10 @@ public:
 	}
 
 
-	vector<V> DepthFirstVisit(V& source)
+	vector<V> DFSNonIter(V& source)
 	{
 		int localFootprint = _footprint;
-
+		
 		map<V, Color> color;
 		stack<V> stack;
 		
@@ -179,9 +197,30 @@ public:
 				}
 			}
 		}
+		//DepthFirstVisit<V, E> d;
+		//DepthFirstVisit<int, float> d;
 		return output;
 	}
+	
+	
 
+	DepthFirstVisit<V, E> beginDFS(V& source)
+	{
+		return DepthFirstVisit<V, E>(this, source);
+	}
+
+	DepthFirstVisit<V, E> endDFS()
+	{
+		return DepthFirstVisit<V, E>();
+	}
+
+	
+	V dummyVertexReturn()
+	{ 
+		vector<V> vertexes = getVertexes();
+		V r = vertexes[0];
+		return r;
+	}
 
 	friend ostream& operator<<(ostream& out, Graph g)
 	{

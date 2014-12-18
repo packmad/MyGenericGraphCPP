@@ -2,7 +2,6 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include "Common.h"
 using namespace std;
 
 template <typename V>
