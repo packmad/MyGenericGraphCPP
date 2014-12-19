@@ -14,11 +14,15 @@
 #include <map>
 #include "Color.h"
 #include "DepthFirstVisit.h"
+#include "BreadthFirstVisit.h"
 
 using namespace std;
 
 template <typename V, template<typename V> class E>
 class DepthFirstVisit;
+
+template <typename V, template<typename V> class E>
+class BreadthFirstVisit;
 
 template <typename V, template<typename V> class E>
 class Graph {
@@ -165,45 +169,6 @@ public:
 		return out;
 	}
 
-
-	vector<V> DFSNonIter(V& source)
-	{
-		int localFootprint = _footprint;
-		
-		map<V, Color> color;
-		stack<V> stack;
-		
-		vector<V> vertexes = getVertexes();
-		vector<V> output;
-
-		for(auto v : vertexes)
-		{
-			color[v] = Color::White;
-		}
-		stack.push(source);
-		while (stack.size() != 0)
-		{
-			V tmp = stack.top();
-			stack.pop();
-			if (color[tmp] == Color::White)
-			{
-				color[tmp] = Color::Black;
-				CheckAccess(localFootprint);
-				output.push_back(tmp);
-				vector<V> neighbors = GetNeighbors(tmp);
-				for(auto n : neighbors)
-				{
-					stack.push(n);
-				}
-			}
-		}
-		//DepthFirstVisit<V, E> d;
-		//DepthFirstVisit<int, float> d;
-		return output;
-	}
-	
-	
-
 	DepthFirstVisit<V, E> beginDFS(V& source)
 	{
 		return DepthFirstVisit<V, E>(this, source);
@@ -214,13 +179,17 @@ public:
 		return DepthFirstVisit<V, E>();
 	}
 
-	
-	V dummyVertexReturn()
-	{ 
-		vector<V> vertexes = getVertexes();
-		V r = vertexes[0];
-		return r;
+
+	BreadthFirstVisit<V, E> beginBFS(V& source)
+	{
+		return BreadthFirstVisit<V, E>(this, source);
 	}
+	
+	BreadthFirstVisit<V, E> endBFS()
+	{
+		return BreadthFirstVisit<V, E>();
+	}
+
 
 	friend ostream& operator<<(ostream& out, Graph g)
 	{
@@ -232,51 +201,3 @@ public:
 };
 
 #endif // GRAPH_H
-/*
-
-
-
-
-protected AGraph(IGraphDataStructureFactory<V, E> dataStructureFactory)
-{
-if (dataStructureFactory == null)
-throw new ArgumentNullException();
-_dataStructureFactory = dataStructureFactory; // for getting new edges collection
-_vertexToNeighbors = _dataStructureFactory.GetDictionary();
-}
-
-
-public IEnumerable<V> BreadthFirstVisit(V source)
-{
-if (VertexIsNull(source))
-throw new ArgumentNullException();
-object localFootprint = _footprint;
-
-Dictionary<V, Color> color = new Dictionary<V, Color>();
-Queue<V> queue = new Queue<V>();
-
-foreach (var v in Vertexes)
-{
-color[v] = Color.White;
-}
-color[source] = Color.Gray;
-queue.Enqueue(source);
-
-while (queue.Count != 0)
-{
-V tmp = queue.Dequeue();
-foreach (var n in GetNeighbors(tmp))
-{
-if (color[n] == Color.White)
-{
-color[n] = Color.Gray;
-queue.Enqueue(n);
-}
-}
-color[tmp] = Color.Black;
-CheckAccess(localFootprint);
-yield return tmp;
-}
-}
-
-*/

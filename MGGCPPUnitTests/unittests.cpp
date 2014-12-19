@@ -3,7 +3,6 @@
 #include "Graph.h"
 #include "Edge.h"
 #include "Place.h"
-//#include "DepthFirstVisit.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -16,38 +15,9 @@ namespace MGGCPPUnitTests
 	TEST_CLASS(UnitTest1)
 	{
 		Graph<Place, Edge> _graph;
-		
+
 	public:
 
-		TEST_METHOD(DFSvisit)
-		{
-			City a("a");
-			Town b("b");
-			City c("c");
-			Town d("d");
-			Town e("e");
-			vector<Place> testVertexes = { a, d, c, e, b};
-			vector<Edge<Place>> testEdges = {
-				Edge<Place>(a, b, 1),
-				Edge<Place>(c, e, 2),
-				Edge<Place>(a, d, 3),
-				Edge<Place>(d, c, 4),
-				Edge<Place>(b, c, 5),
-			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
-			}
-
-			vector<Place> visitedVertexes;
-			for (auto it = _graph.beginDFS(a); it != _graph.endDFS(); ++(*it)) {
-				Place* t = (*it).visited;
-				visitedVertexes.push_back(*t);
-			}
-			
-			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
-			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
-		}
-		
 
 		TEST_METHOD(Edge_ConstructorAndGetters)
 		{
@@ -65,15 +35,15 @@ namespace MGGCPPUnitTests
 			string str = stream.str();
 			Assert::IsTrue(str == "[s--3-->d]\n");
 		}
-		
+
 		TEST_METHOD(AddAndRemoveVertex)
 		{
 			Town t("test");
 			_graph.Add(t);
 			Assert::IsTrue(_graph.Contains(t));
 			Assert::IsTrue(_graph.Remove(t));
-			Assert::IsTrue(!_graph.Contains(t));
-			Assert::IsTrue(!_graph.Remove(t));
+			Assert::IsFalse(_graph.Contains(t));
+			Assert::IsFalse(_graph.Remove(t));
 		}
 
 		TEST_METHOD(AddGetRemoveEdges)
@@ -82,9 +52,7 @@ namespace MGGCPPUnitTests
 			Town b("b");
 			City c("c");
 			Town d("d");
-			vector<Edge<Place>> testEdges = { Edge<Place>(a, b, 1), Edge<Place>(b, c, 2), Edge<Place> (c, d, 3)};
-			auto boh = testEdges.end(); //TODO remove
-			auto npt = nullptr;
+			vector<Edge<Place>> testEdges = { Edge<Place>(a, b, 1), Edge<Place>(b, c, 2), Edge<Place>(c, d, 3) };
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
@@ -105,6 +73,7 @@ namespace MGGCPPUnitTests
 			}
 			graphEdges = _graph.getEdges(); //TODO parlarne col prof
 			Assert::IsTrue(graphEdges.size() == 0);
+			Assert::IsFalse(_graph.Remove(testEdges[0]));
 		}
 
 
@@ -114,10 +83,10 @@ namespace MGGCPPUnitTests
 			Town b("b");
 			City c("c");
 			Town d("d");
-			vector<Edge<Place>> testEdges = { 
-				Edge<Place>(a, b, 1), 
-				Edge<Place>(a, c, 2), 
-				Edge<Place>(a, d, 3), 
+			vector<Edge<Place>> testEdges = {
+				Edge<Place>(a, b, 1),
+				Edge<Place>(a, c, 2),
+				Edge<Place>(a, d, 3),
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
@@ -177,20 +146,19 @@ namespace MGGCPPUnitTests
 			Assert::IsTrue(equal(testNeighbors.begin(), testNeighbors.begin() + testNeighbors.size(), graphNeighbors.begin()));
 			_graph.Add(Edge<Place>(a, b, 11));
 			vector<Edge<Place>> graphEdgesFromAtoB = _graph.GetEdges(a, b);
-			vector<Edge<Place>> graphEdgesFromCtoA = _graph.GetEdges(c,a);
-			Assert::IsTrue(graphEdgesFromAtoB.size()==2);
-			Assert::IsTrue(graphEdgesFromCtoA.size()==0);
+			vector<Edge<Place>> graphEdgesFromCtoA = _graph.GetEdges(c, a);
+			Assert::IsTrue(graphEdgesFromAtoB.size() == 2);
+			Assert::IsTrue(graphEdgesFromCtoA.size() == 0);
 		}
 
-		/* NON-ITERATOR WORKING CODE */
-		TEST_METHOD(DFSnonIter)
+		TEST_METHOD(DFSvisit)
 		{
 			City a("a");
 			Town b("b");
 			City c("c");
 			Town d("d");
 			Town e("e");
-			vector<Place> testVertexes = { a, b, c, d, e };
+			vector<Place> testVertexes = { a, d, c, e, b };
 			vector<Edge<Place>> testEdges = {
 				Edge<Place>(a, b, 1),
 				Edge<Place>(c, e, 2),
@@ -201,12 +169,66 @@ namespace MGGCPPUnitTests
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
+
+			vector<Place> visitedVertexes;
+			for (auto it = _graph.beginDFS(a); it != _graph.endDFS(); ++(*it)) {
+				Place* t = (*it).visited;
+				visitedVertexes.push_back(*t);
+			}
+
+			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
+			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
+		}
+
+		TEST_METHOD(BFSvisit)
+		{
+			City a("a");
+			Town b("b");
+			City c("c");
+			Town d("d");
+			Town e("e");
+			vector<Place> testVertexes = { a, b, d, c, e }; //BFS
+			vector<Edge<Place>> testEdges = {
+				Edge<Place>(a, b, 1),
+				Edge<Place>(c, e, 2),
+				Edge<Place>(a, d, 3),
+				Edge<Place>(d, c, 4),
+				Edge<Place>(b, c, 5),
+			};
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
-			vector<Place> dfv = _graph.DFSNonIter(a);
-			Assert::IsTrue(true);
+
+			vector<Place> visitedVertexes;
+			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++(*it)) {
+				Place* t = (*it).visited;
+				visitedVertexes.push_back(*t);
+			}
+
+			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
+			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
 		}
-		
+
+		TEST_METHOD(Dijkstra)
+		{
+			City a("a");
+			Town b("b");
+			City c("c");
+			Town d("d");
+			Town e("e");
+			vector<Place> testVertexes = { a, b, d, c, e }; //BFS
+			vector<Edge<Place>> testEdges = {
+				Edge<Place>(a, b, 1),
+				Edge<Place>(c, e, 2),
+				Edge<Place>(a, d, 3),
+				Edge<Place>(d, c, 4),
+				Edge<Place>(b, c, 5),
+			};
+			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
+				_graph.Add(*it);
+			}
+
+		}
 	};
-}
+
+};

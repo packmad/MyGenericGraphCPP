@@ -36,6 +36,12 @@
     <ClInclude Include="DepthFirstVisit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BreadthFirstVisit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DijkstraAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -13,11 +13,11 @@ template <typename V, template<typename V> class E>
 class DepthFirstVisit : public iterator<input_iterator_tag, V>
 {
 private:
-	Graph<V, E>* _graph = nullptr;;
-	map<V, Color>* _color = nullptr;;
-	stack<V>* _stack = nullptr;;
-	vector<V>* _vertexes = nullptr;;
-	V* _source = nullptr;;
+	Graph<V, E>* _graph = nullptr;
+	map<V, Color>* _color = nullptr;
+	stack<V>* _stack = nullptr;
+	vector<V>* _vertexes = nullptr;
+	V* _source = nullptr;
 
 	void updateVisitedNode();
 	void init();
