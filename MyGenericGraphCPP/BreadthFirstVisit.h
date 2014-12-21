@@ -26,8 +26,7 @@ public:
 	V* visited = nullptr;;
 
 
-	BreadthFirstVisit() : iterator() {
-	}
+	BreadthFirstVisit() : iterator() {} //C2512
 
 	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator() {
 		_graph = graph;
@@ -71,29 +70,29 @@ public:
 
 template <typename V, template<typename V> class E>
 void BreadthFirstVisit<V, E>::init() {
-	*_vertexes = (*_graph).getVertexes();
+	*_vertexes = _graph->getVertexes();
 	for (auto v : *_vertexes)
 	{
 		(*_color)[v] = Color::White;
 	}
 	(*_color)[*_source] = Color::Gray;
-	(*_queue).push(*_source);
+	_queue->push(*_source);
 	updateVisitedNode();
 }
 
 template <typename V, template<typename V> class E>
 void BreadthFirstVisit<V, E>::updateVisitedNode() {
 
-	if ((*_queue).size() != 0) {
-		V* tmp = new V((*_queue).front());
-		(*_queue).pop();
-		vector<V> neighbors = (*_graph).GetNeighbors(*tmp);
+	if (_queue->size() != 0) {
+		V* tmp = new V(_queue->front());
+		_queue->pop();
+		vector<V> neighbors = _graph->GetNeighbors(*tmp);
 		if (neighbors.size() != 0) {
 			for (auto n : neighbors)
 			{
 				if ((*_color)[n] == Color::White) {
 					(*_color)[n] = Color::Gray;
-					(*_queue).push(n);
+					_queue->push(n);
 				}
 			}
 		}

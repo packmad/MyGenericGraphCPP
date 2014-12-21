@@ -3,6 +3,8 @@
 #include "Graph.h"
 #include "Edge.h"
 #include "Place.h"
+#include "DijkstraAlgorithm.h"
+#include "PriorityQueue.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -227,8 +229,37 @@ namespace MGGCPPUnitTests
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
-
+			DijkstraAlgorithm<Place, Edge> da(&_graph, a);
+			Assert::IsTrue(true);
 		}
+
+		TEST_METHOD(Pqueue)
+		{
+			PriorityQueue<string> pqs;
+			// enqueue - contains
+			Assert::IsFalse(pqs.Contains("b"));
+			pqs.Enqueue(2, "b");
+			Assert::IsTrue(pqs.Contains("b"));
+			pqs.Enqueue(1, "a");
+			Assert::IsTrue(pqs.Contains("a"));
+			pqs.Enqueue(4, "d");
+			Assert::IsTrue(pqs.Contains("d"));
+			pqs.Enqueue(3, "c");
+			Assert::IsTrue(pqs.Contains("c"));
+
+			// top - change priority
+			pqs.Enqueue(0, "z");
+			Assert::IsTrue(pqs.Contains("z"));
+			Assert::IsTrue(pqs.Top() == "z");
+			pqs.SafeChangePriority(0, 42, "z");
+			
+			Assert::IsTrue(pqs.Dequeue() == "a");
+			Assert::IsTrue(pqs.Dequeue() == "b");
+			Assert::IsTrue(pqs.Dequeue() == "c");
+			Assert::IsTrue(pqs.Dequeue() == "d");
+			Assert::IsTrue(pqs.Dequeue() == "z");
+		}
+			
 	};
 
 };

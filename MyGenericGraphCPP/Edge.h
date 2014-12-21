@@ -15,6 +15,8 @@ public:
 	V getDestination() { return _destination; };
 	int getWeight() { return _weight; };
 
+	Edge(){} //C2512
+
 	Edge(V source,V destination, int weight)
 	{
 		_source = source;

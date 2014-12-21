@@ -26,8 +26,7 @@ public:
 	V* visited = nullptr;;
 
 	
-	DepthFirstVisit() : iterator() {
-	}
+	DepthFirstVisit() : iterator() {} //C2512
 
 	DepthFirstVisit(Graph<V, E> *const graph, V& source) : iterator() {
 		_graph = graph;
@@ -79,12 +78,12 @@ DepthFirstVisit<V, E>& DepthFirstVisit<V, E>::operator++() {
 */
 template <typename V, template<typename V> class E>
 void DepthFirstVisit<V, E>::init() {
-	*_vertexes = (*_graph).getVertexes();
+	*_vertexes = _graph->getVertexes();
 	for (auto v : *_vertexes)
 	{
 		(*_color)[v] = Color::White;
 	}
-	(*_stack).push(*_source);
+	_stack->push(*_source);
 	//visited = &_source;
 	updateVisitedNode();
 }
@@ -92,25 +91,25 @@ void DepthFirstVisit<V, E>::init() {
 template <typename V, template<typename V> class E>
 void DepthFirstVisit<V, E>::updateVisitedNode() {
 	//Graph<V, E> npgraph = *_graph;
-	if ((*_stack).size() != 0) {
-		V* tmp = new V((*_stack).top());
-		(*_stack).pop();
+	if (_stack->size() != 0) {
+		V* tmp = new V(_stack->top());
+		_stack->pop();
 		if ((*_color)[*tmp] == Color::White)
 		{
 			(*_color)[*tmp] = Color::Black;
 			//CheckAccess(localFootprint);
 			//output.push_back(tmp);
 			visited = tmp;
-			vector<V> neighbors = (*_graph).GetNeighbors(*tmp);
+			vector<V> neighbors = _graph->GetNeighbors(*tmp);
 			if (neighbors.size() != 0) {
 				for (auto n : neighbors)
 				{
-					(*_stack).push(n);
+					_stack->push(n);
 				}
 			}
 		}
 	}
-	if ((*_stack).size() == 0) {
+	if (_stack->size() == 0) {
 		visited = nullptr;
 	}
 }

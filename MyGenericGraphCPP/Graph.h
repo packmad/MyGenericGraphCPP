@@ -40,9 +40,6 @@ class Graph {
 
 public:
 	Graph() {}
-	Graph(const int x) {
-
-	}
 
 	void CheckAccess(int localFootprint) {
 		if (_footprint != localFootprint)
