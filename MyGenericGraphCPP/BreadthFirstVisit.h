@@ -4,13 +4,13 @@
 
 #include <iterator>
 #include <queue>
-using namespace std;
+
 
 template <typename V, template<typename V> class E>
 class Graph;
 
 template <typename V, template<typename V> class E>
-class BreadthFirstVisit : public std::iterator<input_iterator_tag, V>
+class BreadthFirstVisit : public std::iterator<std::input_iterator_tag, V>
 {
 private:
 	std::map<V, Color>* _color = nullptr;
@@ -18,6 +18,7 @@ private:
 	std::vector<V>* _vertexes = nullptr;
 	Graph<V, E>* _graph = nullptr;
 	V* _source = nullptr;
+	unsigned long int _localFootprint;
 
 	void updateVisitedNode();
 	void init();
@@ -30,6 +31,7 @@ public:
 
 	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator() {
 		_graph = graph;
+		_localFootprint = graph->GetVersion();
 		_source = &source;
 		_color = new map < V, Color >;
 		_queue = new queue<V>;
@@ -60,13 +62,27 @@ public:
 	}
 
 	BreadthFirstVisit<V, E>& operator*() {
+		/* this works
+		try {
+			_graph->CheckVersion(_localFootprint);
+		}
+		catch (...)
+		{
+			int debug = 1;
+		}
+		*/
+		_graph->CheckVersion(_localFootprint);
 		return *this;
+	}
+	void ex(){
+		_graph->CheckVersion(0);
 	}
 
 };
 
 
 #include "Graph.h" 
+
 
 template <typename V, template<typename V> class E>
 void BreadthFirstVisit<V, E>::init() {

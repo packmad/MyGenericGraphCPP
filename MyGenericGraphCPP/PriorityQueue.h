@@ -10,12 +10,12 @@ class PQelem
 {
 public:
 	unsigned int priority;
-	TV value;
+	TV* value;
 
 	PQelem(){}
 
-	PQelem(unsigned int p, TV v) : priority{ p } {
-		value = v;
+	PQelem(unsigned int p, TV& v) : priority{ p } {
+		value = &v;
 	};
 
 	bool operator==(const PQelem<TV>& rhs) {
@@ -46,30 +46,31 @@ private:
 public:
 	
 
-	bool Contains(TV value)
+	bool Contains(const TV& value)
 	{
 		for (auto e : _pq)
 		{
-			if (e.value == value)
+			if (*(e.value) == value)
 				return true;
 		}
 		return false;
 	}
 
-	void Enqueue(unsigned int priority, TV value) {
+	void Enqueue(unsigned int priority,TV& value) {
 		if (Contains(value)) // no duplicated values
 			return;
 		_pq.push_back(PQelem<TV>(priority, value));
 		SortPQ();
 	}
 
-	TV Top() {
+	TV* Top() {
 		return _pq[_pq.size() - 1].value;
 	}
 
-	TV Dequeue() {
-		//if (_pq.size() == 0) TODO
-		TV out = _pq[_pq.size()-1].value;
+	TV* Dequeue() {
+		if (_pq.size() == 0)
+			return nullptr;
+		TV* out = _pq[_pq.size()-1].value;
 		_pq.pop_back();
 		return out;
 	}
@@ -78,14 +79,15 @@ public:
 		return _pq.size() == 0;
 	}
 
-	void SafeChangePriority(unsigned int oldPriority, unsigned int newPriority, TV value) {
+	void SafeChangePriority(unsigned int oldPriority, unsigned int newPriority,const TV& value) {
 		for (auto& e : _pq)
 		{
-			if (e.value == value && e.priority == oldPriority) {
+			if (*(e.value) == value && e.priority == oldPriority) {
 				e.priority = newPriority;
 				SortPQ();
 				return;
 			}
+			
 		}
 	}
 	 

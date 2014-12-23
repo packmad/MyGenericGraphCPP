@@ -24,15 +24,13 @@ public:
 	}
 };
 
-namespace std {
-	template<>
-	class hash <Place> {
-	public:
-		size_t operator()(const Place &place) const {
-			return hash<string>()(place.name);
-		}
-	};
-}
+template<>
+class hash <Place> {
+public:
+	size_t operator()(const Place &place) const {
+		return hash<string>()(place.name);
+	}
+};
 
 class City : public Place
 {

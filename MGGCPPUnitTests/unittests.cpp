@@ -13,7 +13,6 @@ using namespace std;
 namespace MGGCPPUnitTests
 {
 
-
 	TEST_CLASS(UnitTest1)
 	{
 		Graph<Place, Edge> _graph;
@@ -211,8 +210,20 @@ namespace MGGCPPUnitTests
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
 		}
 
-		TEST_METHOD(Dijkstra)
+		TEST_METHOD(GraphException)
 		{
+			Town t = Town("t");
+			unsigned long int v;
+
+			v = _graph.GetVersion();
+			_graph.Add(t);
+			Assert::ExpectException<GraphVersionException>([&] { _graph.CheckVersion(v); });
+			
+			v = _graph.GetVersion();
+			_graph.Remove(t);
+			Assert::ExpectException<GraphVersionException>([&] { _graph.CheckVersion(v); });
+
+			//BFS iter exception
 			City a("a");
 			Town b("b");
 			City c("c");
@@ -229,35 +240,83 @@ namespace MGGCPPUnitTests
 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
 				_graph.Add(*it);
 			}
-			DijkstraAlgorithm<Place, Edge> da(&_graph, a);
-			Assert::IsTrue(true);
+
+			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++(*it)) {
+				Place* vis = (*it).visited;
+				if (vis->name == "c") {
+					_graph.Add(t); // add a vertex during BFS
+					Assert::ExpectException<GraphVersionException>([&] { it.operator*(); });
+					break;
+				}
+
+			}
+
+		}
+
+		TEST_METHOD(Dijkstra)
+		{
+			City a("a");
+			Town b("b");
+			City c("c");
+			Town d("d");
+			Town e("e");
+			City f("f");
+			Town g("g");
+			City x("x"); //disconnected
+			vector<Place> testVertexes = { a, b, c, d, e, f, g, x };
+			Edge<Place> e01 = Edge<Place>(a, b, 1);
+			Edge<Place> e02 = Edge<Place>(a, b, 2);
+			Edge<Place> e03 = Edge<Place>(a, d, 3);
+			Edge<Place> e04 = Edge<Place>(d, c, 4);
+			Edge<Place> e05 = Edge<Place>(b, c, 5);
+			Edge<Place> e06 = Edge<Place>(b, e, 7);
+			Edge<Place> e07 = Edge<Place>(c, e, 2);
+			Edge<Place> e08 = Edge<Place>(c, g, 2);
+			Edge<Place> e09 = Edge<Place>(b, f, 42);
+			Edge<Place> e10 = Edge<Place>(g, f, 6);
+			vector<Edge<Place>> testEdges = { e01, e02, e03, e04, e05, e06, e07, e08, e09 , e10};
+			vector<Edge<Place>> dijkstraEdges = {e01, e05, e03, e06, e10, e08};
+ 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
+				_graph.Add(*it);
+			}
+			DijkstraAlgorithm<Place, Edge> dijkstraAlgorithm(&_graph, a);
+			vector<Edge<Place>> dijOut = dijkstraAlgorithm.GetMinimumPaths();
+			Assert::IsTrue(dijOut.size() == dijkstraEdges.size());
+			Assert::IsTrue(equal(dijkstraEdges.begin(), dijkstraEdges.begin() + dijkstraEdges.size(), dijOut.begin()));
 		}
 
 		TEST_METHOD(Pqueue)
 		{
 			PriorityQueue<string> pqs;
+			string a = "a";
+			string b = "b";
+			string c = "c";
+			string d = "d";
+			string z = "z";
+
 			// enqueue - contains
-			Assert::IsFalse(pqs.Contains("b"));
-			pqs.Enqueue(2, "b");
-			Assert::IsTrue(pqs.Contains("b"));
-			pqs.Enqueue(1, "a");
-			Assert::IsTrue(pqs.Contains("a"));
-			pqs.Enqueue(4, "d");
-			Assert::IsTrue(pqs.Contains("d"));
-			pqs.Enqueue(3, "c");
-			Assert::IsTrue(pqs.Contains("c"));
+			Assert::IsFalse(pqs.Contains(b));
+			pqs.Enqueue(2, b);
+			Assert::IsTrue(pqs.Contains(b));
+			pqs.Enqueue(1, a);
+			Assert::IsTrue(pqs.Contains(a));
+			pqs.Enqueue(4, d);
+			Assert::IsTrue(pqs.Contains(d));
+			pqs.Enqueue(3, c);
+			Assert::IsTrue(pqs.Contains(c));
 
 			// top - change priority
-			pqs.Enqueue(0, "z");
-			Assert::IsTrue(pqs.Contains("z"));
-			Assert::IsTrue(pqs.Top() == "z");
-			pqs.SafeChangePriority(0, 42, "z");
-			
-			Assert::IsTrue(pqs.Dequeue() == "a");
-			Assert::IsTrue(pqs.Dequeue() == "b");
-			Assert::IsTrue(pqs.Dequeue() == "c");
-			Assert::IsTrue(pqs.Dequeue() == "d");
-			Assert::IsTrue(pqs.Dequeue() == "z");
+			pqs.Enqueue(0, z);
+			Assert::IsTrue(pqs.Contains(z));
+			Assert::IsTrue(*(pqs.Top()) == z);
+			pqs.SafeChangePriority(0, 42, z);
+
+			Assert::IsTrue(*(pqs.Dequeue()) == a);
+			Assert::IsTrue(*(pqs.Dequeue()) == b);
+			Assert::IsTrue(*(pqs.Dequeue()) == c);
+			Assert::IsTrue(*(pqs.Dequeue()) == d);
+			Assert::IsTrue(*(pqs.Dequeue()) == z);
+			Assert::IsTrue(pqs.Dequeue() == nullptr);
 		}
 			
 	};

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <deque>
+#include <exception>
 #include <iostream>
 #include <iterator>
 #include <stack>
@@ -16,20 +17,27 @@
 #include "DepthFirstVisit.h"
 #include "BreadthFirstVisit.h"
 
-using namespace std;
-
 template <typename V, template<typename V> class E>
 class DepthFirstVisit;
 
 template <typename V, template<typename V> class E>
 class BreadthFirstVisit;
 
+class GraphVersionException : public std::exception
+{
+public:
+	virtual const char* what() const throw()
+	{
+		return "Graph versions are different!";
+	}
+} graphVersionException;
+
+
 template <typename V, template<typename V> class E>
 class Graph {
-	map< V, vector<E<V>> > _vertexToNeighbors;
+	std::map< V, std::vector<E<V>> > _vertexToNeighbors;
 	unsigned long int _footprint;
 	
-
 	void AddSrcDst(E<V>& edge)
 	{
 		if (!Contains(edge.getSource()))
@@ -41,23 +49,26 @@ class Graph {
 public:
 	Graph() {}
 
-	void CheckAccess(int localFootprint) {
-		if (_footprint != localFootprint)
-			throw; //TODO
+	unsigned long int GetVersion() {
+		return _footprint;
 	}
 
-	vector<E<V>> getEdges() {
+	void CheckVersion(unsigned long int localFootprint) {
+		if (_footprint != localFootprint)
+			throw graphVersionException;
+	}
+
+	std::vector<E<V>> getEdges() {
 		vector<E<V>> out;
 		for (auto kvIter = _vertexToNeighbors.cbegin(); kvIter != _vertexToNeighbors.cend(); ++kvIter) {
 			for (auto vIter = kvIter->second.cbegin(); vIter != kvIter->second.cend(); ++vIter) {
-				E<V> tmp = *vIter; //TODO remove, just 4 test
-				out.push_back(tmp);
+				out.push_back(*vIter);
 			}
 		}
 		return out;
 	}
 
-	vector<V> getVertexes() {
+	std::vector<V> getVertexes() {
 		vector<V> out;
 		for (auto kvIter = _vertexToNeighbors.cbegin(); kvIter != _vertexToNeighbors.cend(); ++kvIter) {
 			out.push_back(kvIter->first);
@@ -65,7 +76,7 @@ public:
 		return out;
 	}
 	
-	void Add(V& vertex)
+	void Add(const V& vertex)
 	{
 		if (_vertexToNeighbors.count(vertex)==0)
 		{
@@ -78,28 +89,29 @@ public:
 	{
 		if (!Contains(edge)) // no duplicates
 		{
-			++_footprint;
 			AddSrcDst(edge);
 			_vertexToNeighbors[edge.getSource()].push_back(edge); //src -> neighbors
+			++_footprint;
 		}
 	}
 
-	bool Contains(V& vertex)
+	bool Contains(const V& vertex)
 	{
 		return _vertexToNeighbors.find(vertex) != _vertexToNeighbors.end();
 	}
 
-	bool Contains(E<V>& edge)
+	bool Contains(const E<V>& edge)
 	{
 		vector<E<V>> v = getEdges();
 		return find(v.begin(), v.end(), edge) != v.end();
 	}
 
-	bool Remove(V& vertex)
+	bool Remove(const V& vertex)
 	{
-		map< V, vector<E<V>>>::iterator it = _vertexToNeighbors.find(vertex);
+		map<V, vector<E<V>>>::iterator it = _vertexToNeighbors.find(vertex);
 		if (it != _vertexToNeighbors.end()) {
-			map< V, vector<E<V>>>::iterator removed = _vertexToNeighbors.erase(it);
+			map<V, vector<E<V>>>::iterator removed = _vertexToNeighbors.erase(it);
+			++_footprint;
 			return true;
 		}
 		return false;
@@ -113,17 +125,18 @@ public:
 				remove(tmpEdges.begin(), tmpEdges.end(), edge),
 				tmpEdges.end()
 				);
+			++_footprint;
 			return true;
 		}
 		return false;
 	}
 
-	int GetOutDegree(V& vertex)
+	int GetOutDegree(const V& vertex)
 	{
 		return _vertexToNeighbors[vertex].size();
 	}
 
-	int GetInDegree(V& vertex)
+	int GetInDegree(const V& vertex)
 	{
 		vector<E<V>> graphEdges = getEdges();
 		int inDegree=0;
@@ -135,12 +148,12 @@ public:
 		return inDegree;
 	}
 
-	vector<V> GetNeighbors(V vertex)
+	std::vector<V> GetNeighbors(const V& vertex)
 	{
 		unordered_set<V> us;
 		vector<E<V>> vEdges = _vertexToNeighbors[vertex];
 		for (auto vIter = vEdges.cbegin(); vIter != vEdges.cend(); ++vIter) {
-			E<V> tmpEdge = *vIter; //TODO remove, just 4 test
+			E<V> tmpEdge = *vIter;
 			us.insert(tmpEdge.getDestination());
 		}
 		vector<V> output(us.begin(), us.end());
@@ -148,12 +161,12 @@ public:
 	}
 
 
-	vector<E<V>> GetEdges(V vertex)
+	std::vector<E<V>> GetEdges(const V& vertex)
 	{
 		return _vertexToNeighbors[vertex];
 	}
 
-	vector<E<V>> GetEdges(V src, V dst)
+	std::vector<E<V>> GetEdges(const V& src, const V& dst)
 	{
 		vector<E<V>> out = GetEdges(src);
 		for (auto vIter = out.cbegin(); vIter != out.cend(); ) {
@@ -187,14 +200,6 @@ public:
 		return BreadthFirstVisit<V, E>();
 	}
 
-
-	friend ostream& operator<<(ostream& out, Graph g)
-	{
-		vector<V> vertexes = getVertexes();
-		vector<E<V>> edges = getEdges();
-		//TODO
-		return endl;
-	};
 };
 
 #endif // GRAPH_H

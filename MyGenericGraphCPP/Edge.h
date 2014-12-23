@@ -2,38 +2,32 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-using namespace std;
 
 template <typename V>
 class Edge {
 	V _source;
 	V _destination;
-	int _weight;
+	int _weight = 0;
 
 public:
 	V getSource() { return _source; };
 	V getDestination() { return _destination; };
 	int getWeight() { return _weight; };
 
-	Edge(){} //C2512
+	Edge(){}
 
-	Edge(V source,V destination, int weight)
+	Edge(const V& source,const V& destination, int weight)
 	{
 		_source = source;
 		_destination = destination;
 		_weight = weight;
 	};
 
-	friend ostream& operator<<(ostream& out, Edge e)
+	friend std::ostream& operator<<(std::ostream& out, Edge e)
 	{
 		return out << "[" << e.getSource() << "--" << e.getWeight() << "-->" << e.getDestination() << "]" << endl;
 	};
-	/*
-	friend bool operator==(Edge e, Edge y)
-	{ 
-		return true;
-	};
-	*/
+
 };
 
 template <typename V>
