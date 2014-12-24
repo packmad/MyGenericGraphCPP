@@ -15,7 +15,7 @@ class DijkstraAlgorithm
 private:
 	std::map<V, unsigned int> _distance;
 	std::map<V, E<V>> _nextEdge;
-	PriorityQueue<V> _priorityQueue;
+	PriorityQueue<unsigned int, V> _priorityQueue;
 	Graph<V, E>* _graph = nullptr;
 	unsigned long int _localFootprint;
 	V* _source = nullptr;

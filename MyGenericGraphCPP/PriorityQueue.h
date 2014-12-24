@@ -5,47 +5,60 @@
 #include <algorithm>
 #include <vector>
 
-template <typename TV>
+template <typename TP, typename TV>
 class PQelem
 {
 public:
-	unsigned int priority;
+	TP priority;
 	TV* value;
 
 	PQelem(){}
 
-	PQelem(unsigned int p, TV& v) : priority{ p } {
+	PQelem(TP p, TV& v) : priority{ p } {
 		value = &v;
 	};
 
-	bool operator==(const PQelem<TV>& rhs) {
+	bool operator==(const PQelem<TP,TV>& rhs) {
 		return this->priority == rhs.priority;
 	}
 
-	bool operator!=(const PQelem<TV>& rhs) {
+	bool operator!=(const PQelem<TP,TV>& rhs) {
 		return !(*this == rhs);
 	}
 
-	bool operator< (const PQelem<TV>& rhs) const {
+	bool operator< (const PQelem<TP,TV>& rhs) const {
 		return this->priority > rhs.priority;
 	}
 };
 
+/**
+ * DISCLAIMER:
+ * this isn't the proper way to implement a priority queue! 
+ * Unfortunately the std::priority_queue lacks of a method for change objects' priority.
+ * Moreover I need that it contains no duplicated values.
+ * So, this little project is focused on graphs with generic content, 
+ * so I chosed an easy way, but inefficient.
+ */
 
-template <typename TV>
+template <typename TP, typename TV>
 class PriorityQueue
 {
 private:
-	std::vector<PQelem<TV>> _pq;
-	
+	std::vector<PQelem<TP, TV>> _pq;
+	unsigned long int _footprint = 0;
+	unsigned long int _lastSortFootprint = 0;
 
+	// O(n logn)
 	void SortPQ() {
-		std::sort(_pq.begin(), _pq.end());
+		if (_lastSortFootprint != _footprint) {
+			std::sort(_pq.begin(), _pq.end());
+			_lastSortFootprint = _footprint;
+		}
 	}
 
 public:
 	
-
+	// O(n)
 	bool Contains(const TV& value)
 	{
 		for (auto e : _pq)
@@ -56,22 +69,27 @@ public:
 		return false;
 	}
 
-	void Enqueue(unsigned int priority,TV& value) {
+	// O(n)
+	void Enqueue(TP priority, TV& value) {
 		if (Contains(value)) // no duplicated values
 			return;
-		_pq.push_back(PQelem<TV>(priority, value));
-		SortPQ();
+		_pq.push_back(PQelem<TP, TV>(priority, value));
+		++_footprint;
 	}
 
+	// O(n logn)
 	TV* Top() {
+		SortPQ();
 		return _pq[_pq.size() - 1].value;
 	}
 
+	// O(n logn)
 	TV* Dequeue() {
 		if (_pq.size() == 0)
 			return nullptr;
+		SortPQ();
 		TV* out = _pq[_pq.size()-1].value;
-		_pq.pop_back();
+		_pq.pop_back(); //queue remains ordered
 		return out;
 	}
 
@@ -79,19 +97,18 @@ public:
 		return _pq.size() == 0;
 	}
 
-	void SafeChangePriority(unsigned int oldPriority, unsigned int newPriority,const TV& value) {
+	// O(n)
+	void SafeChangePriority(TP oldPriority, TP newPriority, const TV& value) {
 		for (auto& e : _pq)
 		{
 			if (*(e.value) == value && e.priority == oldPriority) {
 				e.priority = newPriority;
-				SortPQ();
+				++_footprint;
 				return;
 			}
-			
 		}
 	}
 	 
-
 };
 
 #endif

@@ -287,7 +287,7 @@ namespace MGGCPPUnitTests
 
 		TEST_METHOD(Pqueue)
 		{
-			PriorityQueue<string> pqs;
+			PriorityQueue<unsigned int, string> pqs;
 			string a = "a";
 			string b = "b";
 			string c = "c";
