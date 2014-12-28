@@ -79,6 +79,7 @@
     <ClInclude Include="DepthFirstVisit.h" />
     <ClInclude Include="DijkstraAlgorithm.h" />
     <ClInclude Include="Edge.h" />
+    <ClInclude Include="Footprint.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="stdafx.h" />

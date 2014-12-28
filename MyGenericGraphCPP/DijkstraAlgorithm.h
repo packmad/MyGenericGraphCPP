@@ -17,7 +17,7 @@ private:
 	std::map<V, E<V>> _nextEdge;
 	PriorityQueue<unsigned int, V> _priorityQueue;
 	Graph<V, E>* _graph = nullptr;
-	unsigned long int _localFootprint;
+	Footprint _localFootprint;
 	V* _source = nullptr;
 	std::vector<E<V>> _minPaths;
 

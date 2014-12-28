@@ -14,6 +14,7 @@
 #include <vector>
 #include <map>
 #include "Color.h"
+#include "Footprint.h"
 #include "DepthFirstVisit.h"
 #include "BreadthFirstVisit.h"
 
@@ -36,7 +37,7 @@ public:
 template <typename V, template<typename V> class E>
 class Graph {
 	std::map< V, std::vector<E<V>> > _vertexToNeighbors;
-	unsigned long int _footprint;
+	Footprint _footprint;
 	
 	void AddSrcDst(E<V>& edge)
 	{
@@ -49,11 +50,11 @@ class Graph {
 public:
 	Graph() {}
 
-	unsigned long int GetVersion() {
+	Footprint GetVersion() {
 		return _footprint;
 	}
 
-	void CheckVersion(unsigned long int localFootprint) {
+	void CheckVersion(Footprint localFootprint) {
 		if (_footprint != localFootprint)
 			throw graphVersionException;
 	}

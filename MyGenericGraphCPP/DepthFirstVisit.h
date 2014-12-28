@@ -3,6 +3,7 @@
 #define DEPTHFIRSTVISIT_H
 
 #include <iterator>
+#include "Footprint.h"
 
 
 template <typename V, template<typename V> class E>
@@ -17,7 +18,7 @@ private:
 	std::vector<V>* _vertexes = nullptr;
 	Graph<V, E>* _graph = nullptr;
 	V* _source = nullptr;
-	unsigned long int _localFootprint;
+	Footprint _localFootprint;
 
 	void updateVisitedNode();
 	void init();

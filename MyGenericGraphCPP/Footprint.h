@@ -2,11 +2,6 @@
 #ifndef FOOTPRINT_H
 #define FOOTPRINT_H
 
-class Footprint {
-public:
-	bool operator==(const Footprint &other) const {
-		return this == &other;
-	}
-};
+typedef unsigned long int Footprint;
 
 #endif 

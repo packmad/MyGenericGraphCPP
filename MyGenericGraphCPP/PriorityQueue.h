@@ -45,8 +45,8 @@ class PriorityQueue
 {
 private:
 	std::vector<PQelem<TP, TV>> _pq;
-	unsigned long int _footprint = 0;
-	unsigned long int _lastSortFootprint = 0;
+	Footprint _footprint = 0;
+	Footprint _lastSortFootprint = 0;
 
 	// O(n logn)
 	void SortPQ() {
