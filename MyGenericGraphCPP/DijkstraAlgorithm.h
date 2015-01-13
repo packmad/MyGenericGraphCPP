@@ -24,7 +24,7 @@ private:
 	void RunAlgorithm()
 	{
 		_distance[*_source] = 0;
-		vector<V> vertexes = (*_graph).getVertexes();
+		vector<V> vertexes = (*_graph).GetVertexes();
 		for (auto& v : vertexes)
 		{
 			if (v != *_source)
@@ -71,7 +71,8 @@ public:
 		RunAlgorithm();
 	}
 
-	std::vector<E<V>> GetMinimumPaths() {
+	std::vector<E<V>> GetMinimumPaths() const
+	{
 		_graph->CheckVersion(_localFootprint);
 		return _minPaths;
 	}

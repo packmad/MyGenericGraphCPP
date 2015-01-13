@@ -26,10 +26,10 @@ private:
 public:
 	V* visited = nullptr;;
 
-	
 	DepthFirstVisit() : iterator() {} //C2512
 
-	DepthFirstVisit(Graph<V, E> *const graph, V& source) : iterator() {
+	DepthFirstVisit(Graph<V, E> *const graph, V& source) : iterator()
+	{
 		_graph = graph;
 		_localFootprint = graph->GetVersion();
 		_source = &source;
@@ -39,29 +39,34 @@ public:
 		visited = nullptr;
 
 		init();
-	};
+	}
 	
-	~DepthFirstVisit() {
+	~DepthFirstVisit()
+	{
 		delete _color;
 		delete _stack;
 		delete _vertexes;
 	}
 
 	
-	bool operator!=(const DepthFirstVisit<V, E>& rhs) {
+	bool operator!=(const DepthFirstVisit<V, E>& rhs)
+	{
 		return !(*this == rhs);
 	}
 	
-	bool operator==(const DepthFirstVisit<V, E>& rhs) {
+	bool operator==(const DepthFirstVisit<V, E>& rhs)
+	{
 		return (this->visited == nullptr &&  rhs.visited == nullptr);
 	}
 	
-	DepthFirstVisit<V, E>& operator++() {
+	DepthFirstVisit<V, E>& operator++() 
+	{
 		updateVisitedNode();
 		return *this;
 	}
 	
-	DepthFirstVisit<V, E>& operator*() {
+	DepthFirstVisit<V, E>& operator*() 
+	{
 		_graph->CheckVersion(_localFootprint);
 		return *this;
 	}
@@ -72,9 +77,10 @@ public:
 
 
 template <typename V, template<typename V> class E>
-void DepthFirstVisit<V, E>::init() {
-	*_vertexes = _graph->getVertexes();
-	for (auto v : *_vertexes)
+void DepthFirstVisit<V, E>::init() 
+{
+	*_vertexes = _graph->GetVertexes();
+	for (const auto v : *_vertexes)
 	{
 		(*_color)[v] = Color::White;
 	}
@@ -83,7 +89,8 @@ void DepthFirstVisit<V, E>::init() {
 }
 
 template <typename V, template<typename V> class E>
-void DepthFirstVisit<V, E>::updateVisitedNode() {
+void DepthFirstVisit<V, E>::updateVisitedNode() 
+{
 	if (_stack->size() != 0) {
 		V* tmp = new V(_stack->top());
 		_stack->pop();
@@ -93,7 +100,7 @@ void DepthFirstVisit<V, E>::updateVisitedNode() {
 			visited = tmp;
 			vector<V> neighbors = _graph->GetNeighbors(*tmp);
 			if (neighbors.size() != 0) {
-				for (auto n : neighbors)
+				for (const auto n : neighbors)
 				{
 					_stack->push(n);
 				}

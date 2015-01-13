@@ -54,25 +54,26 @@ namespace MGGCPPUnitTests
 			City c("c");
 			Town d("d");
 			vector<Edge<Place>> testEdges = { Edge<Place>(a, b, 1), Edge<Place>(b, c, 2), Edge<Place>(c, d, 3) };
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
+
 			Assert::IsTrue(_graph.Contains(a));
 			Assert::IsTrue(_graph.Contains(b));
 			Assert::IsTrue(_graph.Contains(c));
 			Assert::IsTrue(_graph.Contains(d));
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				Assert::IsTrue(_graph.Contains(*it));
+			for (auto &edge : testEdges) {
+				Assert::IsTrue(_graph.Contains(edge));
 			}
 
-			vector<Edge<Place>> graphEdges = _graph.getEdges();
+			vector<Edge<Place>> graphEdges = _graph.GetEdges();
 			Assert::IsTrue(testEdges.size() == graphEdges.size());
 			Assert::IsTrue(equal(testEdges.begin(), testEdges.begin() + testEdges.size(), graphEdges.begin()));
 
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				Assert::IsTrue(_graph.Remove(*it));
+			for (auto &edge : testEdges) {
+				Assert::IsTrue(_graph.Remove(edge));
 			}
-			graphEdges = _graph.getEdges(); //TODO parlarne col prof
+			graphEdges = _graph.GetEdges();
 			Assert::IsTrue(graphEdges.size() == 0);
 			Assert::IsFalse(_graph.Remove(testEdges[0]));
 		}
@@ -84,6 +85,7 @@ namespace MGGCPPUnitTests
 			Town b("b");
 			City c("c");
 			Town d("d");
+			City x("x"); // doesn't belong to graph
 			vector<Edge<Place>> testEdges = {
 				Edge<Place>(a, b, 1),
 				Edge<Place>(a, c, 2),
@@ -91,32 +93,36 @@ namespace MGGCPPUnitTests
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
 			Assert::IsTrue(_graph.Contains(a));
 			Assert::IsTrue(_graph.Contains(b));
 			Assert::IsTrue(_graph.Contains(c));
 			Assert::IsTrue(_graph.Contains(d));
+			Assert::IsFalse(_graph.Contains(x));
 			Assert::IsTrue(_graph.GetOutDegree(a) == 3);
 			Assert::IsTrue(_graph.GetOutDegree(b) == 1);
 			Assert::IsTrue(_graph.GetOutDegree(c) == 0);
 			Assert::IsTrue(_graph.GetOutDegree(d) == 1);
+			Assert::ExpectException<VertexBelongException>([&] { _graph.GetOutDegree(x); });
 			Assert::IsTrue(_graph.GetInDegree(a) == 0);
 			Assert::IsTrue(_graph.GetInDegree(b) == 1);
 			Assert::IsTrue(_graph.GetInDegree(c) == 3);
 			Assert::IsTrue(_graph.GetInDegree(d) == 1);
+			Assert::ExpectException<VertexBelongException>([&] { _graph.GetInDegree(x); });
 		}
 
 
 		TEST_METHOD(GetVertexes)
 		{
 			vector<Place> ttowns = { Town("a"), Town("b"), Town("c"), Town("d"), Town("e") };
-			for (auto it = ttowns.begin(); it != ttowns.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &place : ttowns) {
+				_graph.Add(place);
 			}
-			vector<Place> graphVertexes = _graph.getVertexes();
+			vector<Place> graphVertexes = _graph.GetVertexes();
 			Assert::IsTrue(ttowns.size() == graphVertexes.size());
+			//ttowns[0].name = "buggone";
 			Assert::IsTrue(equal(ttowns.begin(), ttowns.begin() + ttowns.size(), graphVertexes.begin()));
 		}
 
@@ -134,8 +140,8 @@ namespace MGGCPPUnitTests
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
 			Assert::IsTrue(_graph.Contains(a));
 			Assert::IsTrue(_graph.Contains(b));
@@ -167,8 +173,8 @@ namespace MGGCPPUnitTests
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
 
 			vector<Place> visitedVertexes;
@@ -188,6 +194,10 @@ namespace MGGCPPUnitTests
 			City c("c");
 			Town d("d");
 			Town e("e");
+
+			Town x("x"); // disconncted
+			_graph.Add(x);
+
 			vector<Place> testVertexes = { a, b, d, c, e }; //BFS
 			vector<Edge<Place>> testEdges = {
 				Edge<Place>(a, b, 1),
@@ -196,19 +206,28 @@ namespace MGGCPPUnitTests
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
-
 			vector<Place> visitedVertexes;
-			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++(*it)) {
-				Place* t = (*it).visited;
-				visitedVertexes.push_back(*t);
+
+			BreadthFirstVisit<Place, Edge> it = _graph.beginBFS(x); // begin from disconnected
+			{
+				BreadthFirstVisit<Place, Edge> y = _graph.beginBFS(a);
+				it = y;
+			}
+			
+			for (; it != _graph.endBFS(); ++(*it)) {
+				Place t = it.visited;
+				visitedVertexes.push_back(t);
 			}
 
 			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
+
 		}
+
+
 
 		TEST_METHOD(GraphException)
 		{
@@ -237,20 +256,19 @@ namespace MGGCPPUnitTests
 				Edge<Place>(d, c, 4),
 				Edge<Place>(b, c, 5),
 			};
-			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
 
 			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++(*it)) {
-				Place* vis = (*it).visited;
-				if (vis->name == "c") {
+				Place vis = it.visited;
+				if (vis.name == "c") {
 					_graph.Add(t); // add a vertex during BFS
 					Assert::ExpectException<GraphVersionException>([&] { it.operator*(); });
 					break;
 				}
 
 			}
-
 		}
 
 		TEST_METHOD(Dijkstra)
@@ -276,8 +294,8 @@ namespace MGGCPPUnitTests
 			Edge<Place> e10 = Edge<Place>(g, f, 6);
 			vector<Edge<Place>> testEdges = { e01, e02, e03, e04, e05, e06, e07, e08, e09 , e10};
 			vector<Edge<Place>> dijkstraEdges = {e01, e05, e03, e06, e10, e08};
- 			for (auto it = testEdges.begin(); it != testEdges.end(); ++it) {
-				_graph.Add(*it);
+			for (auto &edge : testEdges) {
+				_graph.Add(edge);
 			}
 			DijkstraAlgorithm<Place, Edge> dijkstraAlgorithm(&_graph, a);
 			vector<Edge<Place>> dijOut = dijkstraAlgorithm.GetMinimumPaths();

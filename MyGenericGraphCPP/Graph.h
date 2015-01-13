@@ -24,7 +24,16 @@ class DepthFirstVisit;
 template <typename V, template<typename V> class E>
 class BreadthFirstVisit;
 
-class GraphVersionException : public std::exception
+class GraphException : public std::exception
+{
+public:
+	virtual const char* what() const throw()
+	{
+		return "Generic Graph Exception";
+	}
+};
+
+class GraphVersionException : GraphException
 {
 public:
 	virtual const char* what() const throw()
@@ -32,6 +41,15 @@ public:
 		return "Graph versions are different!";
 	}
 } graphVersionException;
+
+class VertexBelongException : GraphException
+{
+public:
+	virtual const char* what() const throw()
+	{
+		return "The vertex doesn't belong to the graph!";
+	}
+} vertexBelongException;
 
 
 template <typename V, template<typename V> class E>
@@ -47,6 +65,7 @@ class Graph {
 			Add(edge.getDestination());
 	}
 
+
 public:
 	Graph() {}
 
@@ -54,25 +73,29 @@ public:
 		return _footprint;
 	}
 
-	void CheckVersion(Footprint localFootprint) {
+	void CheckVersion(Footprint localFootprint) const 
+	{
 		if (_footprint != localFootprint)
 			throw graphVersionException;
 	}
 
-	std::vector<E<V>> getEdges() {
+	std::vector<E<V>> GetEdges() const
+	{
 		vector<E<V>> out;
-		for (auto kvIter = _vertexToNeighbors.cbegin(); kvIter != _vertexToNeighbors.cend(); ++kvIter) {
-			for (auto vIter = kvIter->second.cbegin(); vIter != kvIter->second.cend(); ++vIter) {
-				out.push_back(*vIter);
+		for (const auto &kv : _vertexToNeighbors) {
+			for (const auto &v : kv.second) {
+				out.push_back(v);
 			}
 		}
 		return out;
 	}
 
-	std::vector<V> getVertexes() {
+	std::vector<V> GetVertexes() const
+	{
 		vector<V> out;
-		for (auto kvIter = _vertexToNeighbors.cbegin(); kvIter != _vertexToNeighbors.cend(); ++kvIter) {
-			out.push_back(kvIter->first);
+		for (const auto &kv : _vertexToNeighbors) {
+			//const V* x = &kv.first;
+			out.push_back(kv.first);
 		}
 		return out;
 	}
@@ -96,14 +119,14 @@ public:
 		}
 	}
 
-	bool Contains(const V& vertex)
+	bool Contains(const V& vertex) const
 	{
 		return _vertexToNeighbors.find(vertex) != _vertexToNeighbors.end();
 	}
 
-	bool Contains(const E<V>& edge)
+	bool Contains(const E<V>& edge) const
 	{
-		vector<E<V>> v = getEdges();
+		vector<E<V>> v = GetEdges();
 		return find(v.begin(), v.end(), edge) != v.end();
 	}
 
@@ -132,43 +155,56 @@ public:
 		return false;
 	}
 
-	int GetOutDegree(const V& vertex)
+	unsigned int GetOutDegree(const V& vertex) const
 	{
-		return _vertexToNeighbors[vertex].size();
+		auto vIt = _vertexToNeighbors.find(vertex);
+		if (vIt == _vertexToNeighbors.end())
+			throw vertexBelongException;
+		return vIt->second.size();
 	}
 
-	int GetInDegree(const V& vertex)
+	unsigned int GetInDegree(const V& vertex) const
 	{
-		vector<E<V>> graphEdges = getEdges();
-		int inDegree=0;
-		for (auto it = graphEdges.begin(); it != graphEdges.end(); ++it) {
-			E<V> tmpEdge = *it;
-			if (tmpEdge.getDestination() == vertex)
+		if (!Contains(vertex))
+			throw vertexBelongException;
+		vector<E<V>> graphEdges = GetEdges();
+		int inDegree = 0;
+		for (auto &edge : graphEdges) {
+			if (edge.getDestination() == vertex)
 				++inDegree;
 		}
 		return inDegree;
+
 	}
 
-	std::vector<V> GetNeighbors(const V& vertex)
+	std::vector<V> GetNeighbors(const V& vertex) const
 	{
+		auto vIt = _vertexToNeighbors.find(vertex);
+		if (vIt == _vertexToNeighbors.end())
+			throw vertexBelongException;
+
 		unordered_set<V> us;
-		vector<E<V>> vEdges = _vertexToNeighbors[vertex];
-		for (auto vIter = vEdges.cbegin(); vIter != vEdges.cend(); ++vIter) {
-			E<V> tmpEdge = *vIter;
-			us.insert(tmpEdge.getDestination());
+		vector<E<V>> vEdges = vIt->second;
+		for (auto &edge : vEdges) {
+			us.insert(edge.getDestination());
 		}
 		vector<V> output(us.begin(), us.end());
 		return output;
 	}
 
 
-	std::vector<E<V>> GetEdges(const V& vertex)
+	std::vector<E<V>> GetEdges(const V& vertex) const
 	{
-		return _vertexToNeighbors[vertex];
+		auto vIt = _vertexToNeighbors.find(vertex);
+		if (vIt == _vertexToNeighbors.end())
+			throw vertexBelongException;
+		return vIt->second;
 	}
 
-	std::vector<E<V>> GetEdges(const V& src, const V& dst)
+	std::vector<E<V>> GetEdges(const V& src, const V& dst) const
 	{
+		if (!(Contains(src) && Contains(dst))) //tnx De Morgan :-)
+			throw vertexBelongException;
 		vector<E<V>> out = GetEdges(src);
 		for (auto vIter = out.cbegin(); vIter != out.cend(); ) {
 			E<V> tmpEdge = *vIter;
@@ -182,6 +218,8 @@ public:
 
 	DepthFirstVisit<V, E> beginDFS(V& source)
 	{
+		if (!Contains(source))
+			throw vertexBelongException;
 		return DepthFirstVisit<V, E>(this, source);
 	}
 
@@ -193,6 +231,8 @@ public:
 
 	BreadthFirstVisit<V, E> beginBFS(V& source)
 	{
+		if (!Contains(source))
+			throw vertexBelongException;
 		return BreadthFirstVisit<V, E>(this, source);
 	}
 	

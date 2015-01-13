@@ -9,17 +9,19 @@ using namespace std;
 class Place {
 public:
 	string name;
-	Place() { }
-	Place(string n) {
-		name = n;
-	}
-	bool operator< (const Place& rhs) const {
+	Place() {}
+	Place(string n) : name(n) {}
+
+	bool operator< (const Place& rhs) const
+	{
 		return name < rhs.name;
 	}
-	bool operator== (const Place& rhs) const {
+	bool operator== (const Place& rhs) const
+	{
 		return name == rhs.name;
 	}
-	bool operator!= (const Place& rhs) const {
+	bool operator!= (const Place& rhs) const
+	{
 		return !(name == rhs.name);
 	}
 };
@@ -27,7 +29,8 @@ public:
 template<>
 class hash <Place> {
 public:
-	size_t operator()(const Place &place) const {
+	size_t operator()(const Place &place) const
+	{
 		return hash<string>()(place.name);
 	}
 };

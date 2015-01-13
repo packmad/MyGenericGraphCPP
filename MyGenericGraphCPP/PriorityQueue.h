@@ -14,19 +14,23 @@ public:
 
 	PQelem(){}
 
-	PQelem(TP p, TV& v) : priority{ p } {
+	PQelem(TP p, TV& v) : priority{ p } 
+	{
 		value = &v;
 	};
 
-	bool operator==(const PQelem<TP,TV>& rhs) {
+	bool operator==(const PQelem<TP, TV>& rhs) const
+	{
 		return this->priority == rhs.priority;
 	}
 
-	bool operator!=(const PQelem<TP,TV>& rhs) {
+	bool operator!=(const PQelem<TP, TV>& rhs) const
+	{
 		return !(*this == rhs);
 	}
 
-	bool operator< (const PQelem<TP,TV>& rhs) const {
+	bool operator< (const PQelem<TP,TV>& rhs) const 
+	{
 		return this->priority > rhs.priority;
 	}
 };
@@ -49,7 +53,8 @@ private:
 	Footprint _lastSortFootprint = 0;
 
 	// O(n logn)
-	void SortPQ() {
+	void SortPQ() 
+	{
 		if (_lastSortFootprint != _footprint) {
 			std::sort(_pq.begin(), _pq.end());
 			_lastSortFootprint = _footprint;
@@ -70,7 +75,8 @@ public:
 	}
 
 	// O(n)
-	void Enqueue(TP priority, TV& value) {
+	void Enqueue(TP priority, TV& value) 
+	{
 		if (Contains(value)) // no duplicated values
 			return;
 		_pq.push_back(PQelem<TP, TV>(priority, value));
@@ -78,13 +84,15 @@ public:
 	}
 
 	// O(n logn)
-	TV* Top() {
+	TV* Top() 
+	{
 		SortPQ();
 		return _pq[_pq.size() - 1].value;
 	}
 
 	// O(n logn)
-	TV* Dequeue() {
+	TV* Dequeue() 
+	{
 		if (_pq.size() == 0)
 			return nullptr;
 		SortPQ();
@@ -93,12 +101,14 @@ public:
 		return out;
 	}
 
-	bool IsEmpty() {
+	bool IsEmpty() const
+	{
 		return _pq.size() == 0;
 	}
 
 	// O(n)
-	void SafeChangePriority(TP oldPriority, TP newPriority, const TV& value) {
+	void SafeChangePriority(TP oldPriority, TP newPriority, const TV& value) 
+	{
 		for (auto& e : _pq)
 		{
 			if (*(e.value) == value && e.priority == oldPriority) {
