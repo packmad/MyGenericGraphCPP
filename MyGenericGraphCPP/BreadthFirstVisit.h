@@ -80,9 +80,7 @@ public:
 
 	bool operator==(const BreadthFirstVisit<V, E>& rhs)
 	{
-		// puntatore grafo e visited null
-		return (this->_graph == rhs._graph && this->visited == rhs.visited) 
-			|| (this->_visitIsEnded == true && rhs._visitIsEnded == true);
+		return (this->_visitIsEnded == true && rhs._visitIsEnded == true);
 	}
 
 	BreadthFirstVisit<V, E>& operator++()
