@@ -19,8 +19,6 @@ private:
 	std::unique_ptr< std::queue<V> > _queue = nullptr;
 	std::unique_ptr< std::vector<V> > _vertexes = nullptr;
 	Graph<V, E>* _graph = nullptr;
-	V* _source = nullptr;
-	
 	Footprint _localFootprint;
 	bool _visitIsEnded;
 
@@ -28,50 +26,25 @@ private:
 	void init();
 
 public:
-	V visited;
+	V& visited;
 
-	BreadthFirstVisit() : iterator() {
+	BreadthFirstVisit() : iterator() , visited(V()) 
+	{
 		_visitIsEnded = true;
 	}
 
-	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator()
+	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator() , visited(source)
 	{
 		_color.reset(new map < V, Color >);
-		//_queue.reset(new queue<std::unique_ptr<V>>);
 		_queue.reset(new queue<V>);
 		_vertexes.reset(new vector<V>);
 		_graph = graph;
 		_localFootprint = graph->GetVersion();
-		_source = &source;
 		_visitIsEnded = false;
-//		visited = nullptr;
+		visited = source;
 		init();
 	};
 
-	/*
-	~BreadthFirstVisit()
-	{
-		delete _color;
-		delete _queue;
-		delete _vertexes;
-		
-	}
-	*/
-
-	BreadthFirstVisit<V, E>& operator=( BreadthFirstVisit<V, E>& rhs)
-	{
-		if (this != &rhs) {
-			_color = std::move(rhs._color);
-			_queue = std::move(rhs._queue);
-			_vertexes = std::move(rhs._vertexes);
-			_graph = rhs._graph;
-			_source = rhs._source;
-			_localFootprint = rhs._localFootprint;
-			_visitIsEnded = rhs._visitIsEnded;
-			visited = std::move(rhs.visited);
-		}
-		return *this;
-	}
 
 	bool operator!=(const BreadthFirstVisit<V, E>& rhs)
 	{
@@ -80,7 +53,8 @@ public:
 
 	bool operator==(const BreadthFirstVisit<V, E>& rhs)
 	{
-		return (this->_visitIsEnded == true && rhs._visitIsEnded == true);
+		return (this->_visitIsEnded && rhs._visitIsEnded )
+			|| (this->_graph == rhs._graph && this->visited == rhs.visited);
 	}
 
 	BreadthFirstVisit<V, E>& operator++()
@@ -100,7 +74,6 @@ public:
 
 #include "Graph.h" 
 
-
 template <typename V, template<typename V> class E>
 void BreadthFirstVisit<V, E>::init() {
 	*_vertexes = _graph->GetVertexes();
@@ -108,8 +81,9 @@ void BreadthFirstVisit<V, E>::init() {
 	{
 		(*_color)[v] = Color::White;
 	}
-	(*_color)[*_source] = Color::Gray;
-	_queue->push(*_source);
+	// visited == source
+	(*_color)[visited] = Color::Gray;
+	_queue->push(visited);
 	updateVisitedNode();
 }
 
@@ -120,13 +94,11 @@ void BreadthFirstVisit<V, E>::updateVisitedNode()
 		V tmp = _queue->front();
 		_queue->pop();
 		vector<V> neighbors = _graph->GetNeighbors(tmp);
-		if (neighbors.size() != 0) {
-			for (V n : neighbors)
-			{
-				if ((*_color)[n] == Color::White) {
-					(*_color)[n] = Color::Gray;
-					_queue->push(n);
-				}
+		for (V n : neighbors)
+		{
+			if ((*_color)[n] == Color::White) {
+				(*_color)[n] = Color::Gray;
+				_queue->push(n);
 			}
 		}
 		(*_color)[tmp] = Color::Black;
