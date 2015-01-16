@@ -187,7 +187,7 @@ namespace MGGCPPUnitTests
 				it = x; // now begin from a
 				Assert::IsTrue(it == x);
 				DepthFirstVisit<Place, Edge> y(x);
-				DepthFirstVisit<Place, Edge> z(_graph.beginDFS(a));
+				DepthFirstVisit<Place, Edge> z(std::move(_graph.beginDFS(a)));
 				Assert::IsTrue(x == y);
 				Assert::IsTrue(z == y);
 			}
@@ -229,7 +229,7 @@ namespace MGGCPPUnitTests
 				Assert::IsTrue(it == x);
 				
 				BreadthFirstVisit<Place, Edge> y(x);
-				BreadthFirstVisit<Place, Edge> z(_graph.beginBFS(a));
+				BreadthFirstVisit<Place, Edge> z(std::move(_graph.beginBFS(a)));
 				Assert::IsTrue(x == y);
 				Assert::IsTrue(z == y);
 			}

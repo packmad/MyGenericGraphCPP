@@ -39,13 +39,13 @@ private:
 
 	void SwapBFS(BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
 	{
-		src._color = std::move(rhs._color);
-		src._queue = std::move(rhs._queue);
-		src._vertexes = std::move(rhs._vertexes);
-		src._graph = rhs._graph;
-		src._localFootprint = rhs._localFootprint;
-		src._visitIsEnded = rhs._visitIsEnded;
-		src.visited = std::move(rhs.visited);
+		src._color = std::move(dst._color);
+		src._queue = std::move(dst._queue);
+		src._vertexes = std::move(dst._vertexes);
+		src._graph = dst._graph;
+		src._localFootprint = dst._localFootprint;
+		src._visitIsEnded = dst._visitIsEnded;
+		src.visited = std::move(dst.visited);
 	}
 
 public:
