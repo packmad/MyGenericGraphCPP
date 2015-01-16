@@ -19,7 +19,6 @@ private:
 	std::unique_ptr< std::queue<V> > _queue = nullptr;
 	std::unique_ptr< std::vector<V> > _vertexes = nullptr;
 	Graph<V, E>* _graph = nullptr;
-	V* _source = nullptr;
 	
 	Footprint _localFootprint;
 	bool _visitIsEnded;
@@ -27,51 +26,78 @@ private:
 	void updateVisitedNode();
 	void init();
 
-public:
-	V visited;
+	void DeepCopyBFS(const BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
+	{
+		*(dst._color) = *(src._color);
+		*(dst._queue) = *(src._queue);
+		*(dst._vertexes) = *(src._vertexes);
+		*(dst._graph) = *(src._graph);
+		dst._localFootprint = src._graph->GetVersion();
+		dst.visited = src.visited;
+		dst._visitIsEnded = src._visitIsEnded;
+	}
 
-	BreadthFirstVisit() : iterator() {
+	void SwapBFS(BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
+	{
+		src._color = std::move(rhs._color);
+		src._queue = std::move(rhs._queue);
+		src._vertexes = std::move(rhs._vertexes);
+		src._graph = rhs._graph;
+		src._localFootprint = rhs._localFootprint;
+		src._visitIsEnded = rhs._visitIsEnded;
+		src.visited = std::move(rhs.visited);
+	}
+
+public:
+	V& visited;
+
+	// Default constructor
+	BreadthFirstVisit() : iterator(), visited(V()) 
+	{
 		_visitIsEnded = true;
 	}
 
-	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator()
+	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator(), visited(source)
 	{
 		_color.reset(new map < V, Color >);
-		//_queue.reset(new queue<std::unique_ptr<V>>);
 		_queue.reset(new queue<V>);
 		_vertexes.reset(new vector<V>);
 		_graph = graph;
 		_localFootprint = graph->GetVersion();
-		_source = &source;
 		_visitIsEnded = false;
-//		visited = nullptr;
 		init();
 	};
 
-	/*
-	~BreadthFirstVisit()
+	// Copy constructor
+	BreadthFirstVisit<V, E>(const BreadthFirstVisit<V, E>& bfv) : BreadthFirstVisit(bfv._graph, bfv.visited)
 	{
-		delete _color;
-		delete _queue;
-		delete _vertexes;
-		
+		DeepCopyBFS(bfv, *this);
 	}
-	*/
 
-	BreadthFirstVisit<V, E>& operator=( BreadthFirstVisit<V, E>& rhs)
+	// Move constructor
+	BreadthFirstVisit<V, E>(BreadthFirstVisit<V, E>&& bfv) : BreadthFirstVisit(bfv._graph, bfv.visited)
+	{
+		SwapBFS(bfv, *this);
+	}
+
+	// Copy assignment operator
+	BreadthFirstVisit<V, E>& operator=(const BreadthFirstVisit<V, E>& rhs)
 	{
 		if (this != &rhs) {
-			_color = std::move(rhs._color);
-			_queue = std::move(rhs._queue);
-			_vertexes = std::move(rhs._vertexes);
-			_graph = rhs._graph;
-			_source = rhs._source;
-			_localFootprint = rhs._localFootprint;
-			_visitIsEnded = rhs._visitIsEnded;
-			visited = std::move(rhs.visited);
+			DeepCopyBFS(rhs, *this);
 		}
 		return *this;
 	}
+
+	// Move assignment operator
+	BreadthFirstVisit<V, E>& operator=(BreadthFirstVisit<V, E>&& rhs)
+	{
+		SwapBFS(rhs, dst);
+		return *this;
+	}
+
+	// Destructor allowing subtype polymorphism
+	virtual ~BreadthFirstVisit<V, E>() {}
 
 	bool operator!=(const BreadthFirstVisit<V, E>& rhs)
 	{
@@ -80,9 +106,8 @@ public:
 
 	bool operator==(const BreadthFirstVisit<V, E>& rhs)
 	{
-		// puntatore grafo e visited null
-		return (this->_graph == rhs._graph && this->visited == rhs.visited) 
-			|| (this->_visitIsEnded == true && rhs._visitIsEnded == true);
+		return (this->_graph == rhs._graph && this->visited == rhs.visited)
+			|| (this->_visitIsEnded && rhs._visitIsEnded);
 	}
 
 	BreadthFirstVisit<V, E>& operator++()
@@ -110,8 +135,9 @@ void BreadthFirstVisit<V, E>::init() {
 	{
 		(*_color)[v] = Color::White;
 	}
-	(*_color)[*_source] = Color::Gray;
-	_queue->push(*_source);
+	// here visited == source
+	(*_color)[visited] = Color::Gray;
+	_queue->push(visited);
 	updateVisitedNode();
 }
 
@@ -122,13 +148,11 @@ void BreadthFirstVisit<V, E>::updateVisitedNode()
 		V tmp = _queue->front();
 		_queue->pop();
 		vector<V> neighbors = _graph->GetNeighbors(tmp);
-		if (neighbors.size() != 0) {
-			for (V n : neighbors)
-			{
-				if ((*_color)[n] == Color::White) {
-					(*_color)[n] = Color::Gray;
-					_queue->push(n);
-				}
+		for (V n : neighbors)
+		{
+			if ((*_color)[n] == Color::White) {
+				(*_color)[n] = Color::Gray;
+				_queue->push(n);
 			}
 		}
 		(*_color)[tmp] = Color::Black;

@@ -106,6 +106,11 @@ public:
 		return _pq.size() == 0;
 	}
 
+	int Size() const
+	{
+		return _pq.size();
+	}
+
 	// O(n)
 	void SafeChangePriority(TP oldPriority, TP newPriority, const TV& value) 
 	{

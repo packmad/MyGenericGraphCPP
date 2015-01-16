@@ -165,7 +165,11 @@ namespace MGGCPPUnitTests
 			City c("c");
 			Town d("d");
 			Town e("e");
-			vector<Place> testVertexes = { a, d, c, e, b };
+
+			Town x("x"); // disconncted
+			_graph.Add(x);
+
+			vector<Place> testVertexes = { a, d, c, e, b }; //DFS
 			vector<Edge<Place>> testEdges = {
 				Edge<Place>(a, b, 1),
 				Edge<Place>(c, e, 2),
@@ -176,13 +180,21 @@ namespace MGGCPPUnitTests
 			for (auto &edge : testEdges) {
 				_graph.Add(edge);
 			}
-
 			vector<Place> visitedVertexes;
-			for (auto it = _graph.beginDFS(a); it != _graph.endDFS(); ++(*it)) {
-				Place* t = (*it).visited;
-				visitedVertexes.push_back(*t);
+			DepthFirstVisit<Place, Edge> it = _graph.beginDFS(x); // begin from disconnected
+			{
+				DepthFirstVisit<Place, Edge> x = _graph.beginDFS(a);
+				it = x; // now begin from a
+				Assert::IsTrue(it == x);
+				DepthFirstVisit<Place, Edge> y(x);
+				DepthFirstVisit<Place, Edge> z(_graph.beginDFS(a));
+				Assert::IsTrue(x == y);
+				Assert::IsTrue(z == y);
 			}
-
+			for (/* it begin from a */; it != _graph.endDFS(); ++(*it)) {
+				Place t = it.visited;
+				visitedVertexes.push_back(t);
+			}
 			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
 		}
@@ -210,21 +222,23 @@ namespace MGGCPPUnitTests
 				_graph.Add(edge);
 			}
 			vector<Place> visitedVertexes;
-
 			BreadthFirstVisit<Place, Edge> it = _graph.beginBFS(x); // begin from disconnected
 			{
-				BreadthFirstVisit<Place, Edge> y = _graph.beginBFS(a);
-				it = y;
+				BreadthFirstVisit<Place, Edge> x = _graph.beginBFS(a);
+				it = x; // now begin from a
+				Assert::IsTrue(it == x);
+				
+				BreadthFirstVisit<Place, Edge> y(x);
+				BreadthFirstVisit<Place, Edge> z(_graph.beginBFS(a));
+				Assert::IsTrue(x == y);
+				Assert::IsTrue(z == y);
 			}
-			
-			for (; it != _graph.endBFS(); ++(*it)) {
+			for (/* it begin from a */; it != _graph.endBFS(); ++(*it)) {
 				Place t = it.visited;
 				visitedVertexes.push_back(t);
 			}
-
 			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
-
 		}
 
 
@@ -314,13 +328,22 @@ namespace MGGCPPUnitTests
 
 			// enqueue - contains
 			Assert::IsFalse(pqs.Contains(b));
+			Assert::IsTrue(pqs.Size() == 0);
 			pqs.Enqueue(2, b);
 			Assert::IsTrue(pqs.Contains(b));
+			Assert::IsTrue(pqs.Size() == 1);
 			pqs.Enqueue(1, a);
 			Assert::IsTrue(pqs.Contains(a));
+			Assert::IsTrue(pqs.Size() == 2);
 			pqs.Enqueue(4, d);
 			Assert::IsTrue(pqs.Contains(d));
+			Assert::IsTrue(pqs.Size() == 3);
 			pqs.Enqueue(3, c);
+			Assert::IsTrue(pqs.Size() == 4);
+			pqs.Enqueue(3, c);
+			Assert::IsTrue(pqs.Size() == 4);
+			pqs.Enqueue(3, c);
+			Assert::IsTrue(pqs.Size() == 4);
 			Assert::IsTrue(pqs.Contains(c));
 
 			// top - change priority
