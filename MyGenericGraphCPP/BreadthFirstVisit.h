@@ -26,7 +26,7 @@ private:
 	void updateVisitedNode();
 	void init();
 
-	void DeepCopyBFS(const BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
+	static void DeepCopyBFS(const BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
 	{
 		*(dst._color) = *(src._color);
 		*(dst._queue) = *(src._queue);
@@ -37,15 +37,17 @@ private:
 		dst._visitIsEnded = src._visitIsEnded;
 	}
 
-	void SwapBFS(BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
+	static void SwapAndFreeSrcBFS(BreadthFirstVisit<V, E>& src, BreadthFirstVisit<V, E>& dst)
 	{
-		src._color = std::move(dst._color);
-		src._queue = std::move(dst._queue);
-		src._vertexes = std::move(dst._vertexes);
-		src._graph = dst._graph;
-		src._localFootprint = dst._localFootprint;
-		src._visitIsEnded = dst._visitIsEnded;
-		src.visited = std::move(dst.visited);
+		dst._color.reset(src._color.release());
+		dst._queue.reset(src._queue.release());
+		dst._vertexes = std::move(src._vertexes);
+		dst._graph = src._graph;
+		src._graph = nullptr;
+		dst._localFootprint = src._localFootprint;
+		dst._visitIsEnded = src._visitIsEnded;
+		dst.visited = std::move(src.visited);
+		src._visitIsEnded = true;
 	}
 
 public:
@@ -77,7 +79,7 @@ public:
 	// Move constructor
 	BreadthFirstVisit<V, E>(BreadthFirstVisit<V, E>&& bfv) : BreadthFirstVisit(bfv._graph, bfv.visited)
 	{
-		SwapBFS(bfv, *this);
+		SwapAndFreeSrcBFS(bfv, *this);
 	}
 
 	// Copy assignment operator
@@ -92,7 +94,7 @@ public:
 	// Move assignment operator
 	BreadthFirstVisit<V, E>& operator=(BreadthFirstVisit<V, E>&& rhs)
 	{
-		SwapBFS(rhs, dst);
+		SwapAndFreeSrcBFS(rhs, *this);
 		return *this;
 	}
 

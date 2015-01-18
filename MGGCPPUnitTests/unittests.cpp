@@ -190,6 +190,10 @@ namespace MGGCPPUnitTests
 				DepthFirstVisit<Place, Edge> z(std::move(_graph.beginDFS(a)));
 				Assert::IsTrue(x == y);
 				Assert::IsTrue(z == y);
+				DepthFirstVisit<Place, Edge> j = _graph.beginDFS(a);
+				DepthFirstVisit<Place, Edge> k = _graph.beginDFS(a);
+				j = std::move(k);
+				Assert::IsTrue(j != k);
 			}
 			for (/* it begin from a */; it != _graph.endDFS(); ++(*it)) {
 				Place t = it.visited;
@@ -232,6 +236,11 @@ namespace MGGCPPUnitTests
 				BreadthFirstVisit<Place, Edge> z(std::move(_graph.beginBFS(a)));
 				Assert::IsTrue(x == y);
 				Assert::IsTrue(z == y);
+				BreadthFirstVisit<Place, Edge> j = _graph.beginBFS(a);
+				BreadthFirstVisit<Place, Edge> k = _graph.beginBFS(a);
+				j = std::move(k);
+				Assert::IsTrue(j != k);
+				int fas = 4;
 			}
 			for (/* it begin from a */; it != _graph.endBFS(); ++(*it)) {
 				Place t = it.visited;
