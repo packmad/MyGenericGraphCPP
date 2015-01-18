@@ -195,9 +195,8 @@ namespace MGGCPPUnitTests
 				j = std::move(k);
 				Assert::IsTrue(j != k);
 			}
-			for (/* it begin from a */; it != _graph.endDFS(); ++(*it)) {
-				Place t = it.visited;
-				visitedVertexes.push_back(t);
+			for (/* it begin from a */; it != _graph.endDFS(); ++it) {
+				visitedVertexes.push_back(*it);
 			}
 			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
@@ -242,9 +241,8 @@ namespace MGGCPPUnitTests
 				Assert::IsTrue(j != k);
 				int fas = 4;
 			}
-			for (/* it begin from a */; it != _graph.endBFS(); ++(*it)) {
-				Place t = it.visited;
-				visitedVertexes.push_back(t);
+			for (/* it begin from a */; it != _graph.endBFS(); ++it) {
+				visitedVertexes.push_back(*it);
 			}
 			Assert::IsTrue(testVertexes.size() == visitedVertexes.size());
 			Assert::IsTrue(equal(testVertexes.begin(), testVertexes.begin() + testVertexes.size(), visitedVertexes.begin()));
@@ -283,8 +281,8 @@ namespace MGGCPPUnitTests
 				_graph.Add(edge);
 			}
 
-			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++(*it)) {
-				Place vis = it.visited;
+			for (auto it = _graph.beginBFS(a); it != _graph.endBFS(); ++it) {
+				Place vis = *it;
 				if (vis.name == "c") {
 					_graph.Add(t); // add a vertex during BFS
 					Assert::ExpectException<GraphVersionException>([&] { it.operator*(); });

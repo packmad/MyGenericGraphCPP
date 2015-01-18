@@ -51,15 +51,15 @@ private:
 	}
 
 public:
-	V& visited;
+	V visited;
 
 	// Default constructor
-	DepthFirstVisit() : iterator(), visited(V())
+	DepthFirstVisit() : iterator()
 	{
 		_visitIsEnded = true;
 	}
 
-	DepthFirstVisit(Graph<V, E> *const graph, V& source) : iterator(), visited(source)
+	DepthFirstVisit(Graph<V, E> *const graph, const V& source) : iterator(), visited(source)
 	{
 		_color.reset(new map < V, Color >);
 		_stack.reset(new stack<V>);
@@ -118,10 +118,10 @@ public:
 		return *this;
 	}
 
-	DepthFirstVisit<V, E>& operator*()
+	V& operator*()
 	{
 		_graph->CheckVersion(_localFootprint);
-		return *this;
+		return this->visited;
 	}
 };
 

@@ -51,15 +51,15 @@ private:
 	}
 
 public:
-	V& visited;
+	V visited;
 
 	// Default constructor
-	BreadthFirstVisit() : iterator(), visited(V()) 
+	BreadthFirstVisit() : iterator()
 	{
 		_visitIsEnded = true;
 	}
 
-	BreadthFirstVisit(Graph<V, E> *const graph, V& source) : iterator(), visited(source)
+	BreadthFirstVisit(Graph<V, E> *const graph, const V& source) : iterator(), visited(source)
 	{
 		_color.reset(new map < V, Color >);
 		_queue.reset(new queue<V>);
@@ -118,10 +118,10 @@ public:
 		return *this;
 	}
 
-	BreadthFirstVisit<V, E>& operator*()
+	V& operator*()
 	{
 		_graph->CheckVersion(_localFootprint);
-		return *this;
+		return this->visited;
 	}
 
 };
